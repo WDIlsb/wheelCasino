@@ -2,6 +2,7 @@ const keyboardManager = require("./keyboardManager");
 const { ChatModel } = require("./dbModels");
 const { numberWithSpace, formClick } = require("./tools");
 const { createVkPay } = require("./vkCoinManager");
+const { getCurrentGames } = require("./gameManager");
 
 async function chatManager(msg) {
 
@@ -59,14 +60,23 @@ async function payloadManager(msg) {
       })
       msg.reply(shortLink.short_url)
     },
-    
-
-
 
   }
 
   if (commands[command]) {
-    commands[command]()
+    return commands[command]()
+  }
+
+  const gameCommands = {
+    'bank': ()=>{
+      let currGames =  getCurrentGames;
+      if(!getCurrentGames.length || !getCurrentGames.find(g=>g.id==msg.peerId)) return msg.reply('Сделайте ставку, чтобы начать игру')
+
+    }
+  }
+
+  if (gameCommands[command]) {
+    return gameCommands[command]()
   }
 }
 
