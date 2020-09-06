@@ -1,0 +1,37 @@
+Date : 2020-09-06 22:19:28
+Directory : /Users/admin/Desktop/wheelCasino
+Total : 12 files,  434 codes, 6 comments, 126 blanks, all 566 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         11 |        419 |          6 |        125 |        550 |
+| JSON       |          1 |         15 |          0 |          1 |         16 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                   |         12 |        434 |          6 |        126 |        566 |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                            | language   | code       | comment    | blank      | total      |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/admin/Desktop/wheelCasino/chatManager.js     | JavaScript |         54 |          1 |         19 |         74 |
+| /Users/admin/Desktop/wheelCasino/config.js          | JavaScript |          8 |          0 |          3 |         11 |
+| /Users/admin/Desktop/wheelCasino/dbManager.js       | JavaScript |         65 |          1 |         11 |         77 |
+| /Users/admin/Desktop/wheelCasino/dbModels.js        | JavaScript |         40 |          0 |         11 |         51 |
+| /Users/admin/Desktop/wheelCasino/gameManager.js     | JavaScript |          8 |          0 |          3 |         11 |
+| /Users/admin/Desktop/wheelCasino/keyboardManager.js | JavaScript |         41 |          0 |         14 |         55 |
+| /Users/admin/Desktop/wheelCasino/lsManager.js       | JavaScript |         36 |          0 |         10 |         46 |
+| /Users/admin/Desktop/wheelCasino/package.json       | JSON       |         15 |          0 |          1 |         16 |
+| /Users/admin/Desktop/wheelCasino/qiwiManager.js     | JavaScript |         40 |          4 |         12 |         56 |
+| /Users/admin/Desktop/wheelCasino/tools.js           | JavaScript |          6 |          0 |          5 |         11 |
+| /Users/admin/Desktop/wheelCasino/vkCoinManager.js   | JavaScript |         35 |          0 |          8 |         43 |
+| /Users/admin/Desktop/wheelCasino/wheel.js           | JavaScript |         86 |          0 |         29 |        115 |
+| Total                                               |            |        434 |          6 |        126 |        566 |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
