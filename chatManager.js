@@ -11,6 +11,7 @@ async function chatManager(msg) {
     keyboard: keyboardManager('chat')
   })
 
+
 }
 
 
@@ -67,17 +68,61 @@ async function payloadManager(msg) {
     return commands[command]()
   }
 
-  const gameCommands = {
-    'bank': ()=>{
-      let currGames =  getCurrentGames;
-      if(!getCurrentGames.length || !getCurrentGames.find(g=>g.id==msg.peerId)) return msg.reply('Сделайте ставку, чтобы начать игру')
+  let betAmount=0;
 
+  const gameCommands = {
+    'bank': () => {
+      let currGames = getCurrentGames();
+      if (!currGames.length || !currGames.find(g => g.id == msg.peerId)) return msg.reply('Сделайте ставку, чтобы начать игру')
+    },
+
+    'color': (color) => {
+      console.log(color);
+    },
+
+    'interval': (interval) => {
+      console.log(interval);
+
+    },
+
+    'onNumber': () => {
+      let number = msg.question('Выбери число от 1 до 29');
+      if (!number.text || !/^\d+$/.test(number.text)) {
+        return msg.reply('Вы ввели некорректное значение.')
+      }
+      number = Number(number.text);
+
+
+    },
+
+    'even': () => {
+
+    },
+
+    'odd': () => {
+
+    },
+  }
+
+  if (command != 'bank') {
+    if (!msg.dbUser.balance) {
+      return msg.reply('На твоём балансе нет коинов для ставки')
     }
   }
 
-  if (gameCommands[command]) {
-    return gameCommands[command]()
+  let askBet = msg.question('Введите сумму для ставки');
+  if (!askBet.text || !/^\d+$/.test(askBet.text)) {
+    return msg.reply('Вы ввели некорректное значение.')
   }
+  askBet=Number(askBet.text);
+  if(askBet>msg.dbUser.balance){
+    return msg.reply('На твоём балансе нет такой суммы')
+  }
+  betAmount=askBet;
+
+  if (command.includes('-')) return gameCommands['interval'](command);
+  if (command == 'purple' || command == 'green') return gameCommands['color'](command);
+  return gameCommands[command]();
 }
 
 
