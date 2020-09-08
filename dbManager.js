@@ -14,7 +14,9 @@ mongoose.connect(dbUrl, {
 SettingsModel.find().then(res => {
   if (!res.length) {
     SettingsModel.insertMany([
-      { name: 'roundDuration', value: 120 }
+      { name: 'roundDuration', value: 120 },
+      { name: 'VKC', value: 0 },
+
     ])
   }
 })

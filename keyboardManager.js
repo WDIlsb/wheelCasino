@@ -16,6 +16,8 @@ function keyboardManager(name) {
       [makeButton('Рассылка', 'admMailing')],
       [makeButton('Тип беседы', 'admChatType')],
       [makeButton('Время раунда', 'admRoundDuration')],
+      [makeButton('Установить лимит VKC', 'admSetVKC')],
+
       [makeButton('Назад', 'back')],
 
 

@@ -45,6 +45,7 @@ module.exports = {
   UserModel,
   ChatModel,
   DaysStatModel,
-  SettingsModel
+  SettingsModel,
+  PaymentModel
 }
 

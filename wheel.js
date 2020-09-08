@@ -2,12 +2,12 @@ const { VK, Keyboard } = require('vk-io');
 const { groupToken, groupId } = require('./config');
 
 const { QuestionManager } = require('vk-io-question');
-const { createUser } = require('./dbManager');
+const { createUser, changeChatType } = require('./dbManager');
 const keyboardManager = require('./keyboardManager');
-const { UserModel, ChatModel } = require('./dbModels');
+const { UserModel, ChatModel, SettingsModel } = require('./dbModels');
 const lsManager = require('./lsManager');
 const chatManager = require('./chatManager');
-
+const { DELAY } = require('./tools')
 
 const botVk = new VK({
   token: groupToken,
@@ -91,15 +91,121 @@ updates.use(async (context, next) => {
     return;
   }
 
-  if(context.messagePayload && context.messagePayload.command =='back'){
-    return context.reply('Меню',{
+  if (context.messagePayload && context.messagePayload.command == 'back') {
+    return context.reply('Меню', {
       keyboard: keyboardManager(context.peerType == 'user' ? 'ls' : 'chat')
     })
   }
 
 
+  if (context.messagePayload && context.messagePayload.command.startsWith('adm')) {
+    if (!isUser.isAdmin) return;
+    const { command } = context.messagePayload;
+    if (command == 'admBalance') {
+      let link = await context.question('Ссылку на человека');
+      link = (await botVk.api.utils.resolveScreenName({
+        screen_name: link.text.split('vk.com/')[1]
+      })).object_id;
+
+      if (!link) {
+        return context.send('Некорректная ссылка')
+
+      }
+      console.log(link);
+      const newBalance = await context.question('Теперь введите новый баланс');
+
+      UserModel.findOneAndUpdate({
+        id: Number(link)
+      }, {
+        $set: { balance: Number(newBalance.text) }
+      }).then(res => console.log(res))
+
+    }
+
+    if (command == 'admBalance') {
+      changeChatType(context.peerId)
+      context.send('Изменён')
+    }
+
+    if (command == 'admMailing') {
+      const allUsers = (await UserModel.find()).map(u => u.id);
+      const messageTosend = await context.question(`Следующее ваше сообщение увидит ${allUsers.length} чел.`, {
+        keyboard: Keyboard.keyboard([[Keyboard.textButton({
+          label: 'Отмена',
+          payload: {
+            command: 'back'
+          }
+        })]])
+      });
+      if (messageTosend.text.includes('Отмена')) {
+        return msg.send('Рассылка отменена', {
+          keyboard: keyboardManager('admin')
+        })
+      }
+
+      context.reply('Начинаю рассылку....', {
+        keyboard: keyboardManager('admin')
+
+      });
+      let attAdd = [];
+
+      if (messageTosend.attachments) {
+        messageTosend.attachments.forEach(att => {
+          attAdd.push(String(att))
+        })
+      }
+
+      for (const peer_id of allUsers) {
+        botVk.api.messages.send({
+          peer_id,
+          message: messageTosend.text ? messageTosend.text : '/',
+          attachment: attAdd.join(','),
+          random_id: 0
+        })
+        await DELAY(50)
+      }
+    }
+
+    if (command == 'admRoundDuration') {
+      const newTime = await context.question('Введите новую длительность раунда в секундах')
+      SettingsModel.findOneAndUpdate({
+        name: 'roundDuration'
+      }, {
+        $set: {
+          value: Number(newTime.text)
+        }
+      }).then(_ => context.send('Теперь раунд будет длиться ' + newTime.text + ' сек'))
+
+    }
+
+    if (command == 'admSetVKC') {
+      let limitNow = await SettingsModel.findOne({
+        name: 'VKC'
+      })
+      const newLimit = await context.question(`На балансе доступно ${limitNow.value} VKC, введите новый лимит`)
+      SettingsModel.findOneAndUpdate({
+        name: 'VKC'
+      }, {
+        $set: {
+          value: Number(newLimit.text)
+        }
+      }).then(_ => context.send(`Теперь лимит составлят ${newLimit.text} VKC`))
+
+    }
+
+
+
+
+    return
+
+  }
+
+
+
   context.dbUser = isUser;
   next()
+
+
 })
 
 
