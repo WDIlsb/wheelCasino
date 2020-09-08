@@ -12,7 +12,7 @@ function manageBet({ chatId, persId, type, value, amount }) {
   let isGame = currentGames.find(game => game.chatId == chatId);
   if (isGame) {
     if (isGame.bets.find(bet => bet.persId == persId)) {
-      return [false, 'Вы уже сделали ставку в этой игре']
+      return 'Вы уже сделали ставку в этой игре'
     }
     isGame.bets.push({
       persId,
@@ -20,14 +20,22 @@ function manageBet({ chatId, persId, type, value, amount }) {
       value,
       amount,
     })
-    return [true]
+    return 'Ставка сделана'
   }
 
   currentGames.push({
     chatId,
+    bets: [],
     last: roundDuration * 1000
 
   })
+  currentGames.find(game => game.chatId == chatId).bets.push({
+    persId,
+    type,
+    value,
+    amount,
+  })
+  return 'Игра начата'
 }
 
 
