@@ -29,7 +29,7 @@ async function payloadManager(msg) {
       const totalTop = await getTotalTop();
       let statText = 'Топ 10 за всё время:\n';
       totalTop.forEach(({ name, id, totalWin }, index) => {
-        statText += `${index + 1}. ${formClick(id, name)} - ${numberWithSpace(totalWin)} VKC`
+        statText += `${index + 1}. ${formClick(id, name)} - ${numberWithSpace(totalWin)} VKC\n`
 
       });
       msg.send(statText)

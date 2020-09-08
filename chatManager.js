@@ -1,7 +1,7 @@
 const keyboardManager = require("./keyboardManager");
-const { ChatModel, SettingsModel } = require("./dbModels");
+const { ChatModel, SettingsModel, UserModel } = require("./dbModels");
 const { numberWithSpace, formClick } = require("./tools");
-const { createVkPay } = require("./vkCoinManager");
+const { createVkPay, sendVk } = require("./vkCoinManager");
 const { getCurrentGames, manageBet } = require("./gameManager");
 
 async function chatManager(msg) {
@@ -31,7 +31,15 @@ async function payloadManager(msg) {
         name: 'VKC'
       })
       if(msg.dbUser.balance>VKCLimit.value) return msg.send(`${formClick(msg.senderId,msg.dbUser.name)}, резерв бота недостаточный! Ожидайте пополнения.`);
-      msg.reply(`тут типо Id, выведено ${msg.dbUser.balance} коинов.`)
+      UserModel.findOneAndUpdate({
+        id: msg.senderId
+      },{
+        $set: {
+          balance: 0
+        }
+      }).then(console.log)
+      sendVk(msg.senderId,msg.dbUser.balance*1000)
+      msg.reply(`${formClick(msg.senderId,msg.dbUser.name)}, выведено ${msg.dbUser.balance} коинов.`)
     },
 
     'fill': async () => {
@@ -87,11 +95,12 @@ async function payloadManager(msg) {
         'odd': 'нечётное',
         'purple': 'фиолетовое',
         'green': 'зелёное',
-        'interval': 'промежуток',
+        'intervals': 'промежуток',
         'onNumber': 'число',
         'color': 'цвет'
       }
       let groups = [];
+      console.log(thisGame.bets,'ставки');
       thisGame.bets.forEach(bet => {
         if(groups.find(n=>n[0]==bet.type)){
           groups.find(n=>n[0]==bet.type)[1].push(bet)
@@ -100,6 +109,8 @@ async function payloadManager(msg) {
         }
         
       });
+
+      console.log('groups',groups);
       groups.forEach(group=>{
         readyInfo+=`Ставки на ${typeNames[group[0]]}:\n`
         group[1].forEach(bet=>{
