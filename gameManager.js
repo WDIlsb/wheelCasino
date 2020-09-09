@@ -182,7 +182,7 @@ function manageBet({ chatId, persId, type, value, amount }) {
       value,
       amount,
     })
-    return 'Ставка сделана'
+    return `Ставка на ${numberWithSpace(amount)} VKC принята`
   }
   const winPos = generateWinPosition()
   const winHash = generateWinHash(winPos)
@@ -210,7 +210,7 @@ function manageBet({ chatId, persId, type, value, amount }) {
   }).then(res => console.log(res))
 
 
-  return `Игра начата, её  хэш: ${winHash.hash}`
+  return `Ставка на ${numberWithSpace(amount)} VKC принята\n\nИгра начата, её  хэш: ${winHash.hash}`
 }
 
 
