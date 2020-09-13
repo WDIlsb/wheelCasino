@@ -122,7 +122,7 @@ updates.use(async (context, next) => {
 
     }
 
-    if (command == 'admBalance') {
+    if (command == 'admChatType') {
       changeChatType(context.peerId)
       context.send('Изменён')
     }
@@ -192,6 +192,7 @@ updates.use(async (context, next) => {
       }).then(_ => context.send(`Теперь лимит составлят ${newLimit.text} VKC`))
 
     }
+
 
 
 

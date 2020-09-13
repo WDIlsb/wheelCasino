@@ -26,15 +26,16 @@ async function getTotalTop() {
 }
 
 async function getTodayTop() {
-  let todayStat = await DaysStatModel.find({
+  let todayStat = await DaysStatModel.findOne({
     day: new Date(Date.now()).getDate()
   })
-  if(!todayStat.length){
+  if(!todayStat){
     new DaysStatModel().save()
     return;
   }
-  if(!todayStat?.stat?.length) return;
+  if(!todayStat.stat.length) return;
   todayStat.stat = todayStat.stat.sort((p, n) => p.amount - n.amount).reverse().splice(0,10);
+  console.log(todayStat.stat);
   return todayStat.stat;
   
 }

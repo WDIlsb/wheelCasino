@@ -27,6 +27,7 @@ async function payloadManager(msg) {
 
     'vivod': async() => {
       // Id, выведено 000 000 000 коинов.
+      if(!msg.dbUser.balance) return msg.send('У тебя нет коинов')
       const VKCLimit = await SettingsModel.findOne({
         name: 'VKC'
       })
@@ -39,7 +40,15 @@ async function payloadManager(msg) {
         }
       }).then(console.log)
       sendVk(msg.senderId,msg.dbUser.balance*1000)
-      msg.reply(`${formClick(msg.senderId,msg.dbUser.name)}, выведено ${msg.dbUser.balance} коинов.`)
+      msg.reply(`${formClick(msg.senderId,msg.dbUser.name)}, выведено ${numberWithSpace(msg.dbUser.balance)} коинов.`)
+      SettingsModel.findOneAndUpdate({
+        name: 'VKC'
+
+      },{
+        $inc: {
+          value: -msg.dbUser.balance
+        }
+      }).then(console.log)
     },
 
     'fill': async () => {
@@ -114,7 +123,7 @@ async function payloadManager(msg) {
       groups.forEach(group=>{
         readyInfo+=`Ставки на ${typeNames[group[0]]}:\n`
         group[1].forEach(bet=>{
-          readyInfo+=`${formClick(bet.persId)} - ${numberWithSpace(bet.amount)}\n`
+          readyInfo+=`${formClick(bet.persId,bet.name)}  - ${numberWithSpace(bet.amount)}\n`
         })
       })
       readyInfo+=`\nХэш игры: ${thisGame.winHash.hash}\n\nДо конца ${Math.round(thisGame.last/1000)} сек`;
@@ -122,26 +131,28 @@ async function payloadManager(msg) {
       msg.send(readyInfo)
     },
 
-    'color': (color) => {
+    'color': async (color) => {
       console.log(color);
-      return msg.send(manageBet({
+      return msg.send(await manageBet({
         chatId: msg.peerId,
         persId: msg.senderId,
         type: 'color',
         value: color,
         amount: betAmount
-      }))
+      },msg.dbUser.name))
+
     },
 
-    'interval': (interval) => {
+    'interval': async (interval) => {
       console.log(interval);
-      return msg.send(manageBet({
+      return msg.send(await manageBet({
         chatId: msg.peerId,
         persId: msg.senderId,
         type: 'intervals',
         value: interval,
         amount: betAmount
-      }))
+      },msg.dbUser.name))
+
 
     },
 
@@ -151,41 +162,43 @@ async function payloadManager(msg) {
         return msg.reply('Вы ввели некорректное значение.')
       }
       number = Number(number.text);
-      return msg.send(manageBet({
+      if(number< 0 || number > 29) return;
+      return msg.send(await manageBet({
         chatId: msg.peerId,
         persId: msg.senderId,
         type: 'onNumber',
         value: number,
         amount: betAmount
-      }))
+      },msg.dbUser.name))
 
 
     },
 
-    'even': () => {
+    'even': async() => {
 
-      return msg.send(manageBet({
+      return msg.send(await manageBet({
         chatId: msg.peerId,
         persId: msg.senderId,
         type: 'even',
         amount: betAmount
-      }))
+      },msg.dbUser.name))
 
 
     },
 
-    'odd': () => {
-      return msg.send(manageBet({
+    'odd': async() => {
+      return msg.send(await manageBet({
         chatId: msg.peerId,
         persId: msg.senderId,
         type: 'odd',
         amount: betAmount
-      }))
+      },msg.dbUser.name))
+
     },
   }
 
   if (command != 'bank') {
-    if (!msg.dbUser.balance) {
+    if (!msg.dbUser.balance && !msg.dbUser.bonusBalance) {
       return msg.reply('На твоём балансе нет коинов для ставки')
     }
 
@@ -193,7 +206,9 @@ async function payloadManager(msg) {
     if (!askBet.text || !/^\d+$/.test(askBet.text)) {
       return msg.reply('Вы ввели некорректное значение.')
     }
+    
     askBet=Number(askBet.text);
+    if(!askBet) return;
     if(askBet>msg.dbUser.balance){
       return msg.reply('На твоём балансе нет такой суммы')
     }

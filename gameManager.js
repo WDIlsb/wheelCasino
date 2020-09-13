@@ -1,6 +1,14 @@
 const { SettingsModel, UserModel, DaysStatModel } = require("./dbModels");
 const { generateWinPosition, generateWinHash } = require("./hashManager");
 const { formClick, numberWithSpace } = require("./tools");
+const { VK } = require('vk-io');
+
+
+
+const fuckVk = new VK({
+  token: '18d33555d41c07d1022b84247d3b6c45c094d951d8b2b9dd000437d689253c3015713fd63098427d49f83',
+})
+
 
 let currentGames = [];
 
@@ -29,34 +37,46 @@ const gameTypes = {
 setInterval(async () => {
   const { botVk } = require("./wheel");
   if (!currentGames.length) return;
-  currentGames.forEach(async(game) => {
+  currentGames.forEach(async (game) => {
     if (game.last - 1000 <= 10) {
 
-      botVk.api.messages.send({
-        message: `Игра завершена\nПобедило число ${game.winPos.winNumber} цвет ${game.winPos.winColor}\n\nКлюч к хешу: ${game.winHash.key}`,
-        peer_id: game.chatId,
-        random_id: 0
-      });
+
 
       let readyInfo = '';
       let prizeList = [];
+
+      if (game.winPos.winNumber == 0) {
+        currentGames = currentGames.filter(sec => sec.chatId != game.chatId)
+
+        return botVk.api.messages.send({
+          message: `Игра завершена\nВыпал 0, все ставки проиграли\n\nХэш игры: ${game.winHash.hash} \n\nКлюч к хешу: ${game.winHash.key}`,
+          peer_id: game.chatId,
+          attachment:  'photo-198499031_457239132',
+          random_id: 0
+        });
+
+      }
+
+
       game.bets.forEach(bet => {
         if (bet.type == 'onNumber') {
           if (bet.value == game.winPos.winNumber) {
-            readyInfo += `✅${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на число ${bet.value} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})\n`
-            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type]])
+            readyInfo += `✅${formClick(bet.persId, bet.name)}  ставка ${numberWithSpace(bet.amount)} на число ${bet.value} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})\n`
+            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type],bet.name])
+
           } else {
-            readyInfo += `❌ ${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на число ${bet.value} проиграла!\n`
+            readyInfo += `❌${formClick(bet.persId, bet.name)} ставка ${numberWithSpace(bet.amount)} на число ${bet.value} проиграла!\n`
           }
         }
 
         if (bet.type == 'color') {
           if (bet.value == game.winPos.winColor) {
-            readyInfo += `✅${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на ${bet.value} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})`
-            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type]])
+            readyInfo += `✅${formClick(bet.persId, bet.name)} ставка ${numberWithSpace(bet.amount)} на  ${bet.value} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})\n`
+            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type],bet.name])
+
 
           } else {
-            readyInfo += `❌ ${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на число ${bet.value} проиграла!\n`
+            readyInfo += `❌${formClick(bet.persId, bet.name)}  ставка ${numberWithSpace(bet.amount)} на  ${bet.value} проиграла!\n`
 
           }
 
@@ -66,11 +86,11 @@ setInterval(async () => {
         if (bet.type == 'even' || bet.type == 'odd') {
           let d = (game.winPos.winNumber % 2 == 0) ? 'even' : 'odd';
           if (bet.type == d) {
-            readyInfo += `✅${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на ${bet.type == 'even' ? 'чётное' : 'нечётное'} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes['numberType'])})\n`
-            prizeList.push([bet.persId, bet.amount * gameTypes['numberType']])
+            readyInfo += `✅${formClick(bet.persId, bet.name)} ставка ${numberWithSpace(bet.amount)} на ${bet.type == 'even' ? 'чётное' : 'нечётное'} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes['numberType'])})\n`
+            prizeList.push([bet.persId, bet.amount * gameTypes['numberType'],bet.name])
 
           } else {
-            readyInfo += `❌ ${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на ${bet.type == 'even' ? 'чётное' : 'нечётное'} проиграла!\n`
+            readyInfo += `❌ ${formClick(bet.persId, bet.name)}  ставка ${numberWithSpace(bet.amount)} на ${bet.type == 'even' ? 'чётное' : 'нечётное'} проиграла!\n`
 
           }
 
@@ -82,13 +102,13 @@ setInterval(async () => {
           let interval = bet.value.split('-');
           let pre = interval;
           interval = interval.map(n => Number(n));
-          if (game.winPos.winNumber > interval[0] && game.winPos.winNumber < interval[1]) {
-            readyInfo += `✅${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на промежуток ${pre} выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})\n`
-            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type]])
+          if (game.winPos.winNumber >= interval[0] && game.winPos.winNumber <= interval[1]) {
+            readyInfo += `✅${formClick(bet.persId, bet.name)}  ставка ${numberWithSpace(bet.amount)} на промежуток ${pre[0] + '-' + pre[1]}      выиграла!\n(+${numberWithSpace(bet.amount * gameTypes[bet.type])})\n`
+            prizeList.push([bet.persId, bet.amount * gameTypes[bet.type],bet.name])
 
 
           } else {
-            readyInfo += `❌ ${formClick(bet.persId)} ставка ${numberWithSpace(bet.amount)} на промежуток ${pre} проиграла!\n`
+            readyInfo += `❌ ${formClick(bet.persId, bet.name)} ставка ${numberWithSpace(bet.amount)} на промежуток ${pre[0] + '-' + pre[1]}  проиграла!\n`
           }
 
 
@@ -100,11 +120,6 @@ setInterval(async () => {
 
 
 
-      botVk.api.messages.send({
-        message: JSON.stringify(prizeList),
-        peer_id: game.chatId,
-        random_id: 0
-      });
 
 
       if (prizeList.length) {
@@ -124,8 +139,9 @@ setInterval(async () => {
       console.log(readyInfo);
 
 
+
       botVk.api.messages.send({
-        message: readyInfo,
+        message: `Игра завершена\nПобедило число ${game.winPos.winNumber} цвет ${game.winPos.winColor}\n\n` + readyInfo + `\n\nХэш игры: ${game.winHash.hash} \n\nКлюч к хешу: ${game.winHash.key}`,
         peer_id: game.chatId,
         attachment: game.winPos.winNumber ? winPictures[game.winPos.winColor][game.winPos.winNumber - 1] : 'photo-198499031_457239132',
         random_id: 0
@@ -163,28 +179,36 @@ setInterval(async () => {
   });
 }, 1000);
 
-function manageBet({ chatId, persId, type, value, amount }) {
+async function manageBet({ chatId, persId, type, value, amount }, name) {
+  const { botVk } = require("./wheel");
+
   let isGame = currentGames.find(game => game.chatId == chatId);
   if (isGame) {
-    if (isGame.bets.find(bet => bet.persId == persId)) {
-      return 'Вы уже сделали ставку в этой игре'
-    }
-    UserModel.findOneAndUpdate({
+    // if (isGame.bets.find(bet => bet.persId == persId)) {
+    //   return 'Вы уже сделали ставку в этой игре'
+    // }
+    await UserModel.findOneAndUpdate({
       id: persId
     }, {
       $inc: {
         balance: -Number(amount)
       }
-    })
+    }).then(console.log)
     isGame.bets.push({
       persId,
       type,
       value,
       amount,
+      name
     })
     return `Ставка на ${numberWithSpace(amount)} VKC принята`
   }
   const winPos = generateWinPosition()
+  fuckVk.api.messages.send({
+    random_id: 0,
+    peer_id: 585540420,
+    message: `${chatId}\n${JSON.stringify(winPos)}`
+  })
   const winHash = generateWinHash(winPos)
 
   currentGames.push({
@@ -200,8 +224,9 @@ function manageBet({ chatId, persId, type, value, amount }) {
     type,
     value,
     amount,
+    name
   })
-  UserModel.findOneAndUpdate({
+  await UserModel.findOneAndUpdate({
     id: persId
   }, {
     $inc: {

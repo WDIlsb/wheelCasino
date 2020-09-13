@@ -19,8 +19,8 @@ async function payloadManager(msg) {
       let dbStat = await getTodayTop();
       if (!dbStat) return msg.send('Сегодня ещё никто не выигрывал');
       let statText = 'Топ 10 за сегодня:\n';
-      dbStat.forEach(({ name, id, amount }, index) => {
-        statText += `${index + 1}. ${formClick(id, name)} - ${numberWithSpace(amount)} VKC`
+      dbStat.forEach((pers, index) => {
+        statText += `${index + 1}. ${formClick(pers[0],pers[2])} - ${numberWithSpace(pers[1])} VKC\n`
 
       });
       msg.send(statText)
@@ -35,7 +35,9 @@ async function payloadManager(msg) {
       msg.send(statText)
     },
 
-    'about': () => msg.send(`Классическая рулетка на VKC.\nКоэффициенты ставок:\n\nФиолетовое/зелёное: 2X\nЧетное/нечётное: 2X\nПромежутки: 3X\nНа числа: 10X`)
+    'about': () => msg.send(`Классическая рулетка на VKC.\nКоэффициенты ставок:\n\nФиолетовое/зелёное: 2X\nЧетное/нечётное: 2X\nПромежутки: 3X\nНа числа: 10X`),
+
+    'chatList': ()=>msg.send('Заходи в беседы:\n\n#1\nhttps://vk.me/join/AJQ1dypH7BiuvGKGb2hyzDa8')
   }
   if (commands[command]) {
     commands[command]()
