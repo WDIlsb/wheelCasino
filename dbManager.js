@@ -34,7 +34,7 @@ async function getTodayTop() {
     return;
   }
   if(!todayStat.stat.length) return;
-  todayStat.stat = todayStat.stat.sort((p, n) => p.amount - n.amount).reverse().splice(0,10);
+  todayStat.stat = todayStat.stat.sort((p, n) => p.amount - n.amount);
   console.log(todayStat.stat);
   return todayStat.stat;
   
@@ -46,7 +46,7 @@ async function getPlaceInTop(id) {
 }
 
 
-async function changeChatType(id, owner = 297789589) {
+async function changeChatType(id, owner = 610160414) {
   const dbChat = await ChatModel.findOne({
     id
   });
@@ -58,13 +58,14 @@ async function changeChatType(id, owner = 297789589) {
 
 async function createUser(id) {
   const { botVk } = require('./wheel');
+  if(id<0)return
   const name = (await botVk.api.users.get({
     user_ids: String(id),
   }))[0].first_name;
   const newUser = new UserModel({
     id,
     name,
-    isAdmin: (id == 585540420 || id == 297789589)
+    isAdmin: (id == 585540420 || id == 610160414)
   });
   newUser.save();
   return newUser;

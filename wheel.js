@@ -62,6 +62,7 @@ updates.on(['chat_invite_user'], async (context, next) => {
 
 
 updates.use(async (context, next) => {
+  if(context.senderId<1)return
 
   console.log(context);
 
@@ -101,6 +102,9 @@ updates.use(async (context, next) => {
   if (context.messagePayload && context.messagePayload.command.startsWith('adm')) {
     if (!isUser.isAdmin) return;
     const { command } = context.messagePayload;
+
+
+
     if (command == 'admBalance') {
       let link = await context.question('Ссылку на человека');
       link = (await botVk.api.utils.resolveScreenName({

@@ -19,6 +19,9 @@ async function payloadManager(msg) {
       let dbStat = await getTodayTop();
       if (!dbStat) return msg.send('Сегодня ещё никто не выигрывал');
       let statText = 'Топ 10 за сегодня:\n';
+      dbStat=dbStat.sort((p,n)=>p[1]-n[1])
+      dbStat=dbStat.reverse();
+      dbStat =dbStat.splice(0,10);
       dbStat.forEach((pers, index) => {
         statText += `${index + 1}. ${formClick(pers[0],pers[2])} - ${numberWithSpace(pers[1])} VKC\n`
 

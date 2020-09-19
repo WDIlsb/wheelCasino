@@ -1,5 +1,5 @@
 const axios = require('axios');
-const vkCoinToken = 'IyQEafOZJESjlw*yv;Xf[45Yo-mYUi-J6IAJX;OWU=sXi_N8C,';
+const vkCoinToken = 'K[;GDoAWvUd,MTPgu5xbwLFiiacbvPZciW-Xove.z1-CH2n3uA';
 
 const { PaymentModel, UserModel } = require('./dbModels');
 const { numberWithSpace } = require('./tools');
@@ -7,12 +7,12 @@ const { numberWithSpace } = require('./tools');
 
 
 function createVkPay(summ) {
-    return `vk.com/coin#x297789589_${summ}_888`
+    return `vk.com/coin#x610160414_${summ}_888`
 }
 
 async function vkCoinHistory() {
     let { data } = await axios.post('https://coin-without-bugs.vkforms.ru/merchant/tx/', {
-        merchantId: 297789589,
+        merchantId: 610160414,
         key: vkCoinToken,
         tx: [1]
     })
@@ -21,11 +21,11 @@ async function vkCoinHistory() {
 
 async function getVkBalance() {
     let { data } = await axios.post('https://coin-without-bugs.vkforms.ru/merchant/score/', {
-        merchantId: 297789589,
+        merchantId: 610160414,
         key: vkCoinToken,
-        userIds: [297789589]
+        userIds: [610160414]
     })
-    return Math.floor(data.response[297789589] / 1000);
+    return Math.floor(data.response[610160414] / 1000);
 }
 
 
@@ -98,7 +98,7 @@ setInterval(async () => {
 
 async function sendVk(toId, amount) {
     axios.post('https://coin-without-bugs.vkforms.ru/merchant/send/', {
-        merchantId: 297789589,
+        merchantId: 610160414,
         key: vkCoinToken,
         toId,
         amount

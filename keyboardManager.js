@@ -17,6 +17,8 @@ function keyboardManager(name) {
       [makeButton('Тип беседы', 'admChatType')],
       [makeButton('Время раунда', 'admRoundDuration')],
       [makeButton('Установить лимит VKC', 'admSetVKC')],
+      [makeButton('Бонус за репост', 'admBonus')],
+
 
       [makeButton('Назад', 'back')],
 
@@ -41,7 +43,7 @@ function keyboardManager(name) {
       [makeButton('Чётное', 'even', Keyboard.PRIMARY_COLOR), makeButton('Нечётное', 'odd', Keyboard.PRIMARY_COLOR)],
       [Keyboard.urlButton({
         label: 'Пополнить',
-        url: `https://vk.com/coin#x297789589_1000000_888_1`
+        url: `https://vk.com/coin#x610160414_1000000_888_1`
       }), makeButton('Вывести', 'vivod', Keyboard.POSITIVE_COLOR)],
 
     ]
