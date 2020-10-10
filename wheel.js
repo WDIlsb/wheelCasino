@@ -66,6 +66,7 @@ updates.use(async (context, next) => {
 
   console.log(context);
 
+
   let isUser = await UserModel.findOne({
     id: context.senderId
   })
